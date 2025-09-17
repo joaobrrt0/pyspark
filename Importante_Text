@@ -1,0 +1,114 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyOMo34LdRBT0K1Yg4+NmAoD",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/joaobrrt0/pyspark/blob/main/Importante_Text\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "##Spark Content\n",
+        "É considerado como ponto de entrada entre Spark e Python\n",
+        "É necessario para a criação dos scripts que serão desenvolvidos no Pyspark.\n",
+        "Para se conectar a fonte de dados e ao Spark utilizando seu cluster é necessario criar o SPARK CONTEXT\n"
+      ],
+      "metadata": {
+        "id": "JmTqgxTxnSwl"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "#RDD\n",
+        "RDD(Resilient Distributed Dataset) é a estrutura de dados que permite o armazenamento de dados dentro do  Spark.\n",
+        "Os RDD's são coleções de dados distruibuidos que uma vez criado, não podem mais ser alterados (imutaveis).\n",
+        "Cada conjunto de dados em RDD é divido em partições logicas, que podem ser computadas em diferentes nos do cluster.É necessario que existe o Spark Context\n",
+        "para criar um RDD, Usado para dados estruturados e não estruturados.\n"
+      ],
+      "metadata": {
+        "id": "LZLBRfsCn4bF"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "#DataFrame\n",
+        "É um conjunto de dados organizado em colunas.\n",
+        "É totalmente equivalente ao que conhecemos como tabelas de banco de dados.\n",
+        "Usado para dados estruturados e semi-estruturados.\n"
+      ],
+      "metadata": {
+        "id": "I-B6eBsupTPk"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "#IMPORTANTE SABER\n",
+        "\n",
+        "->É possivel criar um RDD e transforma-lo em DataFrame e vice e versa.\n",
+        "\n",
+        "->Ao subir o Jupyter Notebook com o comando Pyspark, o Spark Context e criado automaticamente\n",
+        "\n",
+        "->Um DataFrame e um RDD de objeto linha, cada um representado um registro.\n",
+        "\n",
+        "->Há outra forma de armazenamento é o Spark Dataset, mas somente tem suporte JAVA e SCALA.\n",
+        "\n",
+        "->Em operações com dados muitas vezes não e possivel guardar-los em um objeto DataFrame (ex:JSON) os RDD's podem ser usados para pré-processar esses dados com grande volume e após podem ser transformados em DataFrame.\n",
+        "\n",
+        "->Existem transformações nos dados que podem ser realizados em RDD que não são possiveis em DataFrames.\n"
+      ],
+      "metadata": {
+        "id": "Pnen6CwJpgM9"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "#IMPORTANTE SABER\n",
+        "->Collect(): Operação utilizada para recuperar todos os elementos do RDD/DataFrame (de todos os nós) para o nó principal.\n",
+        "\n",
+        "->Count(): Retorna o número de linhas em um RDD/Dataframe\n",
+        "\n",
+        "->Parallelize(): Usado para criar um RDD a partir de uma coleção de listas. Partições são unidades básicas de paralelismo em PySpark. RDDs em PySpark são uma coleção de partições.\n",
+        "\n",
+        "->getNumPartitions(): Determina o número de partições RDD's atuais de uma coleção.\n",
+        "\n",
+        "->textFile(): Permite a leitura de um arquivo texto, indicando o local de origem do dado.\n",
+        "\n",
+        "->take(): Os primeiros 'x' elementos de um RDD\n",
+        "\n",
+        "->first(): Retorna o primeiro elemento de um RDD ou primeira linha de um Dataframe.\n",
+        "\n",
+        "->filter(): Retorna um novo RDD contendo apenas os elementos que satisfazem a condição.\n",
+        "\n",
+        "->cache(): Persiste os dados do RDD na memória."
+      ],
+      "metadata": {
+        "id": "lhTIHbChuwdQ"
+      }
+    }
+  ]
+}
