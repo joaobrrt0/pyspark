@@ -1,0 +1,382 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyPcvZ3pBQNVpGj/W6tjO9Y3",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/joaobrrt0/pyspark/blob/main/rdd_03\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Cc1mX0kbtdIN",
+        "outputId": "1c832e43-c8ae-45b8-f153-ab844cf3f248"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Collecting spark\n",
+            "  Downloading spark-0.2.1.tar.gz (41 kB)\n",
+            "\u001b[?25l     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m0.0/41.0 kB\u001b[0m \u001b[31m?\u001b[0m eta \u001b[36m-:--:--\u001b[0m\r\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m41.0/41.0 kB\u001b[0m \u001b[31m3.1 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25h  Preparing metadata (setup.py) ... \u001b[?25l\u001b[?25hdone\n",
+            "Building wheels for collected packages: spark\n",
+            "  Building wheel for spark (setup.py) ... \u001b[?25l\u001b[?25hdone\n",
+            "  Created wheel for spark: filename=spark-0.2.1-py3-none-any.whl size=58748 sha256=1df275d6d1cd00a9b1e21ade431786271416214a8f90782d05c2114ec9693902\n",
+            "  Stored in directory: /root/.cache/pip/wheels/6f/db/e2/945dc8c17477cf9ab56d9f9aa1fa75b75335fffff9b12d867d\n",
+            "Successfully built spark\n",
+            "Installing collected packages: spark\n",
+            "Successfully installed spark-0.2.1\n"
+          ]
+        }
+      ],
+      "source": [
+        "!pip install spark"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install pyspark"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "YQhia6yqthME",
+        "outputId": "cbf00eab-52f0-452b-94ec-d7c70562433f"
+      },
+      "execution_count": 6,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Requirement already satisfied: pyspark in /usr/local/lib/python3.12/dist-packages (3.5.1)\n",
+            "Requirement already satisfied: py4j==0.10.9.7 in /usr/local/lib/python3.12/dist-packages (from pyspark) (0.10.9.7)\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark import SparkContext, SparkConf\n",
+        "from pyspark.sql import SparkSession\n",
+        "\n",
+        "spark = (\n",
+        "     SparkSession.builder\n",
+        "         .master(\"local\")\n",
+        "         .appName(\"Word Count\")\n",
+        "         .config(\"spark.some.config.option\", \"some-value\")\n",
+        "         .getOrCreate()\n",
+        " )"
+      ],
+      "metadata": {
+        "id": "F4U3LebPuMNH"
+      },
+      "execution_count": 16,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "profissional = spark.sparkContext.textFile(\"Profissionais.txt\")\n",
+        "salario = spark.sparkContext.textFile(\"Salario.txt\")"
+      ],
+      "metadata": {
+        "id": "2j2nkhC1urGW"
+      },
+      "execution_count": 22,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "profissional.collect()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "oS_diNTwvtR3",
+        "outputId": "d5b32d9d-4070-4ce3-db5d-9fc4e166d0af"
+      },
+      "execution_count": 23,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "['Carlos,oncologista,hospital',\n",
+              " 'Ana,dentista,clinica',\n",
+              " 'Fernanda,enfermeira,hospital',\n",
+              " 'Sandra,pediatra,clinica',\n",
+              " 'Fatima,dentista,clinica',\n",
+              " 'Gilmar,cardiologista,hospital',\n",
+              " 'Fabio,pediatra,clinica',\n",
+              " 'Hilton,enfermeiro,clinica',\n",
+              " 'Daiane,dentista,clinica',\n",
+              " 'Paulo,farmaceutico,clinica',\n",
+              " 'Gilberto,pediatra,hospital']"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 23
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "salario.collect()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "itJKyBFbv6dZ",
+        "outputId": "e43b40fb-8444-478d-a89e-0f88a37a8241"
+      },
+      "execution_count": 24,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "['Carlos,10000',\n",
+              " 'Ana,7000',\n",
+              " 'Fernanda,5000',\n",
+              " 'Sandra,6000',\n",
+              " 'Fatima,8500',\n",
+              " 'Gilmar,9000',\n",
+              " 'Fabio,12000',\n",
+              " 'Hilton,5000',\n",
+              " 'Jefferson,8000',\n",
+              " 'Antonio,3000',\n",
+              " 'Joaquim,5000']"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 24
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "profissional_ajuste = profissional.map(lambda x:(x.split(\",\")[0],(x.split(\",\")[1],x.split(\",\")[2])))\n",
+        "profissional_ajuste.collect()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "O-ik3H9xv9RS",
+        "outputId": "2e05aa40-ca7e-4ca2-c492-8d7c7ca57ac9"
+      },
+      "execution_count": 37,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[('Carlos', ('oncologista', 'hospital')),\n",
+              " ('Ana', ('dentista', 'clinica')),\n",
+              " ('Fernanda', ('enfermeira', 'hospital')),\n",
+              " ('Sandra', ('pediatra', 'clinica')),\n",
+              " ('Fatima', ('dentista', 'clinica')),\n",
+              " ('Gilmar', ('cardiologista', 'hospital')),\n",
+              " ('Fabio', ('pediatra', 'clinica')),\n",
+              " ('Hilton', ('enfermeiro', 'clinica')),\n",
+              " ('Daiane', ('dentista', 'clinica')),\n",
+              " ('Paulo', ('farmaceutico', 'clinica')),\n",
+              " ('Gilberto', ('pediatra', 'hospital'))]"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 37
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "salario_ajuste = salario.map(lambda x:(x.split(\",\")[0],x.split(\",\")[1]))\n",
+        "salario_ajuste.collect()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "8PS1V1k3xIFk",
+        "outputId": "44b8a2c4-1103-4d67-d41e-bde08074c019"
+      },
+      "execution_count": 38,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[('Carlos', '10000'),\n",
+              " ('Ana', '7000'),\n",
+              " ('Fernanda', '5000'),\n",
+              " ('Sandra', '6000'),\n",
+              " ('Fatima', '8500'),\n",
+              " ('Gilmar', '9000'),\n",
+              " ('Fabio', '12000'),\n",
+              " ('Hilton', '5000'),\n",
+              " ('Jefferson', '8000'),\n",
+              " ('Antonio', '3000'),\n",
+              " ('Joaquim', '5000')]"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 38
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "folha_pagamento = profissional_ajuste.join(salario_ajuste)\n",
+        "folha_pagamento.collect()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "hRPhbjUrxpQ0",
+        "outputId": "7e0b6c79-029c-428c-b4cd-871c3b5f85c1"
+      },
+      "execution_count": 40,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[('Sandra', (('pediatra', 'clinica'), '6000')),\n",
+              " ('Fatima', (('dentista', 'clinica'), '8500')),\n",
+              " ('Carlos', (('oncologista', 'hospital'), '10000')),\n",
+              " ('Ana', (('dentista', 'clinica'), '7000')),\n",
+              " ('Fernanda', (('enfermeira', 'hospital'), '5000')),\n",
+              " ('Gilmar', (('cardiologista', 'hospital'), '9000')),\n",
+              " ('Fabio', (('pediatra', 'clinica'), '12000')),\n",
+              " ('Hilton', (('enfermeiro', 'clinica'), '5000'))]"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 40
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "folha_pagamento = profissional_ajuste.leftOuterJoin(salario_ajuste)\n",
+        "folha_pagamento.collect()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "3pd3vR1VyCfK",
+        "outputId": "28ec252a-b45c-4e7b-9209-6ac9eeca6705"
+      },
+      "execution_count": 41,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[('Sandra', (('pediatra', 'clinica'), '6000')),\n",
+              " ('Fatima', (('dentista', 'clinica'), '8500')),\n",
+              " ('Paulo', (('farmaceutico', 'clinica'), None)),\n",
+              " ('Carlos', (('oncologista', 'hospital'), '10000')),\n",
+              " ('Ana', (('dentista', 'clinica'), '7000')),\n",
+              " ('Fernanda', (('enfermeira', 'hospital'), '5000')),\n",
+              " ('Gilmar', (('cardiologista', 'hospital'), '9000')),\n",
+              " ('Fabio', (('pediatra', 'clinica'), '12000')),\n",
+              " ('Hilton', (('enfermeiro', 'clinica'), '5000')),\n",
+              " ('Daiane', (('dentista', 'clinica'), None)),\n",
+              " ('Gilberto', (('pediatra', 'hospital'), None))]"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 41
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "folha_pagamento = profissional_ajuste.rightOuterJoin(salario_ajuste)\n",
+        "folha_pagamento.collect()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "GtO9ARNdyg86",
+        "outputId": "55b2dc00-7d51-455b-8fd4-b1b007d56880"
+      },
+      "execution_count": 42,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[('Sandra', (('pediatra', 'clinica'), '6000')),\n",
+              " ('Fatima', (('dentista', 'clinica'), '8500')),\n",
+              " ('Antonio', (None, '3000')),\n",
+              " ('Carlos', (('oncologista', 'hospital'), '10000')),\n",
+              " ('Ana', (('dentista', 'clinica'), '7000')),\n",
+              " ('Fernanda', (('enfermeira', 'hospital'), '5000')),\n",
+              " ('Gilmar', (('cardiologista', 'hospital'), '9000')),\n",
+              " ('Fabio', (('pediatra', 'clinica'), '12000')),\n",
+              " ('Hilton', (('enfermeiro', 'clinica'), '5000')),\n",
+              " ('Jefferson', (None, '8000')),\n",
+              " ('Joaquim', (None, '5000'))]"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 42
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "hEKCLW8xyo00"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
